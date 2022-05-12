@@ -5,7 +5,6 @@ import tkinter as tk
 from PIL import Image, ImageTk
 from tkinter import ttk
 
-
 FONT = ('Arial', 12, 'normal')
 
 root = Tk()
@@ -321,6 +320,103 @@ def send_answer_ms():
 # Конец ms
 
 # Начало ss
+
+def valid_string_not_weight_ss(text):
+    tmp_string = text.replace(' ', '').split(',')
+    num = int(node_number_button.get())
+    vizit = set()
+    for i in tmp_string:
+        if not len(i):
+            return False
+        for j in i:
+            if not ('0' <= j and j <= '9'):
+                return False
+        if int(i) > num or int(i) < 0:
+            return False
+        if int(i) in vizit:
+            return False
+        vizit.add(int(i))
+    return True
+
+def valid_string_weight_ss(text):
+    #Написать валидацию с весом ребер
+    return True
+
+focus_entry = ''
+def key_entry(event):
+    global focus_entry
+    focus_entry = root.focus_get()
+
+def valid_entry():
+    global entry_list
+    global focus_entry
+    for i in range(len(entry_list)):
+        text = entry_list[i].get()
+        # #FAD7D4 Нежно красный
+        # #CCFCCC Нежно зеленый
+        if len(text) == text.count(' '):
+            entry_list[i].config({"background": 'White'})
+        elif valid_string_not_weight_ss(text): # В данной строке в зависимости от задачи нужно будет менять функцию валидации valid_string_not_weight_ss и valid_string_weight_ss
+            entry_list[i].config({"background": '#CCFCCC'})
+            text = text.replace(' ', '').split(',')
+            for j in text:
+                if entry_list[int(j)-1] == focus_entry:
+                    continue
+                tmp = entry_list[int(j)-1].get()
+                entry_list[int(j)-1].delete(0, 'end')
+                t = tmp.replace(' ', '').split(',')
+                if not str(i+1) in t:
+                    if len(tmp.replace(' ', '')) == 0:
+                        tmp = str(i+1)
+                    else:
+                        tmp = str(i+1) + ', ' + tmp
+                
+                entry_list[int(j)-1].insert(0, tmp)
+        else:
+            entry_list[i].config({"background": '#FAD7D4'})
+    for i in range(len(entry_list)):
+        text = entry_list[i].get()
+        # #FAD7D4 Нежно красный
+        # #CCFCCC Нежно зеленый
+        if entry_list[i].config("background")[-1] == '#FAD7D4':
+            continue
+        if len(text) == text.count(' '):
+            entry_list[i].config({"background": 'White'})
+            for j in range(len(entry_list)):
+                if i == j:
+                    continue
+                text_j = entry_list[j].get().replace(' ', '').split(',')
+                if str(i+1) in text_j:
+                    entry_list[i].config({"background": '#FAD7D4'})
+                    entry_list[j].config({"background": '#FAD7D4'})
+        elif valid_string_not_weight_ss(text): # В данной строке в зависимости от задачи нужно будет менять функцию валидации valid_string_not_weight_ss и valid_string_weight_ss
+            entry_list[i].config({"background": '#CCFCCC'})
+            
+            entry_list[i].delete(0, 'end')
+            text = text.replace(' ', '').split(',')
+            text2 = []
+            for j in range(len(text)):
+                text2.append(int(text[j]))
+            text2 = sorted(text2)
+            for j in range(len(text)):
+                text[j] = str(text2[j])
+            text2 = text[0]
+            for j in range(1, len(text)):
+                text2 = text2 + ', ' + text[j]
+            entry_list[i].insert(0, text2)
+            text = entry_list[i].get()
+            
+            text = text.replace(' ', '').split(',')
+            for j in text:
+                tmp = entry_list[int(j)-1].get().replace(' ', '').split(',')
+                if not str(i+1) in tmp:
+                    entry_list[i].config({"background": '#FAD7D4'})
+                    entry_list[int(j)-1].config({"background": '#FAD7D4'})
+        else:
+            entry_list[i].config({"background": '#FAD7D4'})
+    
+    return True
+
 entry_list = []
 def create_entries_ss():
     canvas.delete('all')
@@ -333,7 +429,8 @@ def create_entries_ss():
         label = Label(text=f'{i}.', font=('Arial', 12, 'normal'))
         canvas.create_window(x, y, window=label)
 
-        entry = Entry(width=30, font=('Arial', 12, 'normal'))
+        entry = Entry(width=30, font=('Arial', 12, 'normal'), validate="focusout", validatecommand=valid_entry)
+        entry.bind('<KeyPress>', key_entry)
         canvas.create_window(x+150, y, window=entry)
 
         entry_list.append(entry)
@@ -352,13 +449,18 @@ def save_entries_ss():
 
 
 def validate_string_ss(map_string):
-    if ',' in map_string:
-        res = map_string.split(',')
-        res = [int(item.replace(' ', '')) for item in res]
-    else:
-        res = map_string.split(' ')
-        res = [x for x in res if x]
-        res = [int(item) for item in res]
+    res = []
+    map_string = map_string.split(',')
+    for i in map_string:
+        ch = 0
+        check = True
+        for j in i:
+            if '0' <= j and j <= '9':
+                ch = ch * 10 + int(j)
+            elif ch != 0:
+                break
+        if ch != 0:
+            res.append(ch)
     return res
 
 
@@ -366,7 +468,10 @@ def save_entries_with_weight_ss():
     global map_me
     map_me = {}
     for i in range(len(entry_list)):
-        map_me[i+1] = validate_string_with_weight_ss(entry_list[i].get())
+        if len(entry_list[i].get()) == 0:
+            map_me[i+1] = []
+        else:
+            map_me[i+1] = validate_string_with_weight_ss(entry_list[i].get())
     
     print(map_me)
 
