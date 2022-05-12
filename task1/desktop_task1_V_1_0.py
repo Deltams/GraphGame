@@ -53,7 +53,7 @@ def task1_start():
     node_col = set_color_node(G, node_col, point_dfs, 'yellow')
 
     #Отображает пользователю обход графа в глубину
-    animation_graph(G, node_col, edge_col, point_dfs, arr)
+    animation_graph(G, node_col, edge_col, point_dfs, arr, 1)
 
 # Начало mi
 def check_next_mi(cord_i, cord_j):
@@ -620,22 +620,38 @@ def set_color_node(G, node_col, v, col):
         id_col+=1
     return node_col
 
+pos = dict()
 # Отображение пользователю графика на экран
-def animation_graph(G, node_col, edge_col, v, arr):
+def animation_graph(G, node_col, edge_col, v, arr, step):
+    global pos
+    if len(node_col) == step:
+        #Размер ребер
+        edge_lab = nx.get_edge_attributes(G,'weight')
+        check = 1
+        for i in arr:
+            edge_lab[(i[0], i[1])] = check
+            check += 1
+        plt.clf()
+        pos=pos
+        nx.draw_networkx(G, pos, with_labels=True, font_weight='bold', node_color=node_col, edge_color=edge_col, width=2)
+        nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_lab)
+        plt.show(block=False)
+        return
     #Размер ребер
     edge_lab = nx.get_edge_attributes(G,'weight')
-    step = 1
-    for i in arr:
-        set_color_edge(G, edge_col, i, 'red')
-        edge_lab[(i[0], i[1])] = step
-        step += 1
+    set_color_edge(G, edge_col, arr[step-1], 'red')
+    edge_lab[(arr[step-1][0], arr[step-1][1])] = step
     plt.clf()
-    pos=nx.spring_layout(G)
+    if step == 1:
+        pos=nx.spring_layout(G)
+    else:
+        pos=pos
     nx.draw_networkx(G, pos, with_labels=True, font_weight='bold', node_color=node_col, edge_color=edge_col, width=2)
     nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_lab)
 ##    nx.draw(G, with_labels=True, font_weight='bold', node_color=node_col, edge_color=edge_col, width=3)
 ##    plt.legend(labels=[str(v)], loc='best', fontsize=12, shadow=True, framealpha=1, facecolor='#08E8DE', edgecolor='#40E0D0', title=string_legend)
     plt.show(block=False)
+    root.after(500, lambda: animation_graph(G, node_col, edge_col, v, arr, step+1))
 
 draw_menu()
 
