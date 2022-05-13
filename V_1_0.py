@@ -339,13 +339,180 @@ def valid_string_not_weight_ss(text):
     return True
 
 def valid_string_weight_ss(text):
-    #Написать валидацию с весом ребер
+    for i in text:
+        if not (('0' <= i and i <= '9') or i == ':' or \
+           i == ',' or i == ' ' or i == '(' or \
+           i == ')' or i == '[' or i == ']' or ' '):
+            return False
+    tmp_string = text + ' '
+    tmp_text = "" 
+    for i in range(len(tmp_string)-1):
+        if '0' <= tmp_string[i] and tmp_string[i] <= '9' and not ('0' <= tmp_string[i+1] and tmp_string[i+1] <= '9'):
+            tmp_text += tmp_string[i] + '_'
+        else:
+            tmp_text += tmp_string[i]
+    stack_check = []
+    for i in tmp_text:
+        if i == '(' or i == '[':
+            if len(stack_check) != 0:
+                return False
+            stack_check.append(i)
+        elif i == ']' or i == ')':
+            if len(stack_check) == 0:
+                return False
+            elem = stack_check[-1]
+            stack_check.pop(-1)
+            if elem == '(' and i == ')':
+                continue
+            if elem == '[' and i == ']':
+                continue
+            return False
+    if len(stack_check) != 0:
+        return False
+    in_skob = ''
+    tmp_text2 = ''
+    for i in tmp_text:
+        if i == '(' or i == '[':
+            in_skob = ''
+            stack_check.append(i)
+        elif i == ')' or i == ']':
+            if in_skob.count(',') > 1:
+                return False
+            if in_skob.count('_') != 2:
+                return False
+            stack_check.pop(-1)
+        elif len(stack_check) == 1:
+            in_skob += i
+        if len(stack_check) != 1:
+            tmp_text2 += i
+        else:
+            if i != ',':
+                tmp_text2 += i
+    tmp_text = tmp_text2.replace('(', '').replace(')', '').replace('[', '').replace(']', '').replace(' ', '').replace('::', '').split(',')
+    for i in tmp_text:
+        if i.count('_') > 2 or i.count('_') < 1:
+            return False
+        
+    tmp_text = tmp_text2.replace('(', '').replace(')', '').replace('[', '').replace(']', '').replace(' ', '').split(',')
+    for i in tmp_text:
+        if i.count('::') > 1:
+            return False
+        elif i.count('::') == 1:
+            if (len(i.split('::')) == 2 and i.split('::')[0] == '') or (len(i.split('::')) == 2 and i.split('::')[1] == ''):
+                return False
     return True
 
-focus_entry = ''
+focus_entry = None
 def key_entry(event):
     global focus_entry
     focus_entry = root.focus_get()
+
+def valid_replace_and_split(text):
+    text = text + ' '
+    tmp_text = "" 
+    for j in range(len(text)-1):
+        if '0' <= text[j] and text[j] <= '9' and not ('0' <= text[j+1] and text[j+1] <= '9'):
+            tmp_text += text[j] + '_'
+        else:
+            tmp_text += text[j]
+    text = tmp_text
+    text = text.replace('(', '').replace(')', '').replace('[', '').replace(']', '').replace('::', '').replace(' ', '').split(',')
+    return text
+    
+
+def valid_entry_weight():
+    global entry_list
+    global focus_entry
+    for i in range(len(entry_list)):
+        text = entry_list[i].get()
+        # #FAD7D4 Нежно красный
+        # #CCFCCC Нежно зеленый
+        check = valid_string_weight_ss(text)
+        if len(text) == text.count(' '):
+            entry_list[i].config({"background": 'White'})
+        elif check: 
+            entry_list[i].config({"background": '#CCFCCC'})
+            
+            text = valid_replace_and_split(text)
+            
+            for j in text:
+                tmp_text = j.split('_')
+                if not (0 < int(tmp_text[0]) and int(tmp_text[0]) <= len(entry_list)):
+                    entry_list[i].config({"background": '#FAD7D4'})
+                    continue
+                if entry_list[int(tmp_text[0])-1] == focus_entry:
+                    continue
+                tmp = entry_list[int(tmp_text[0])-1].get()
+                text2 = entry_list[int(tmp_text[0])-1].get()
+                text2 = valid_replace_and_split(text2)
+                check = True
+                for q in text2:
+                    tmp_text2 = q.split('_')
+                    if tmp_text2[0] == str(i+1):
+                        check = False
+                        break
+                if check and len(tmp_text) == 2:
+                    if len(tmp.replace(' ', '')) == 0:
+                        tmp = str(i+1) + '::' + '1'
+                    else:
+                        tmp = str(i+1) + '::' + '1, ' + tmp
+                elif check and len(tmp_text) == 3:
+                    if check:
+                        if len(tmp.replace(' ', '')) == 0:
+                            tmp = str(i+1) + '::' + tmp_text[1]
+                        else:
+                            tmp = str(i+1) + '::' + tmp_text[1] + ', ' + tmp
+                entry_list[int(tmp_text[0])-1].delete(0, 'end')
+                entry_list[int(tmp_text[0])-1].insert(0, tmp)
+        else:
+            entry_list[i].config({"background": '#FAD7D4'})
+
+    for i in range(len(entry_list)):
+        text = entry_list[i].get()
+        # #FAD7D4 Нежно красный
+        # #CCFCCC Нежно зеленый
+        if entry_list[i].config("background")[-1] == '#FAD7D4':
+            continue
+        check = valid_string_weight_ss(text)
+        if len(text) == text.count(' '):
+            entry_list[i].config({"background": 'White'})
+        elif check: 
+            entry_list[i].config({"background": '#CCFCCC'})
+            
+            text = valid_replace_and_split(text)
+            vizit = set()
+            for j in text:
+                tmp_text = j.split('_')
+                if not (0 < int(tmp_text[0]) and int(tmp_text[0]) <= len(entry_list)):
+                    entry_list[i].config({"background": '#FAD7D4'})
+                    continue
+                if tmp_text[0] in vizit:
+                    entry_list[i].config({"background": '#FAD7D4'})
+                    continue
+                vizit.add(tmp_text[0])
+                text2 = entry_list[int(tmp_text[0])-1].get()
+                text2 = valid_replace_and_split(text2)
+                check = True
+                for q in text2:
+                    tmp_text2 = q.split('_')
+                    if tmp_text2[0] == str(i+1):
+                        check = False
+                    if tmp_text2[0] == str(i+1) and tmp_text2[1] != tmp_text[1]:
+                        if len(tmp_text2) == 2 and len(tmp_text) == 2:
+                            continue
+                        if len(tmp_text2) == 2 and tmp_text[1] == '1':
+                            continue
+                        if len(tmp_text) == 2 and tmp_text2[1] == '1':
+                            continue
+                        entry_list[i].config({"background": '#FAD7D4'})
+                        entry_list[int(tmp_text[0])-1].config({"background": '#FAD7D4'})
+                if check:
+                    entry_list[i].config({"background": '#FAD7D4'})
+                    entry_list[int(tmp_text[0])-1].config({"background": '#FAD7D4'})
+        else:
+            entry_list[i].config({"background": '#FAD7D4'})
+        
+    return True
 
 def valid_entry():
     global entry_list
@@ -429,9 +596,10 @@ def create_entries_ss():
         label = Label(text=f'{i}.', font=('Arial', 12, 'normal'))
         canvas.create_window(x, y, window=label)
 
-        entry = Entry(width=30, font=('Arial', 12, 'normal'), validate="focusout", validatecommand=valid_entry)
+        # В данной строке в зависимости от задачи нужно будет менять функцию валидации valid_entry и valid_entry_weight
+        entry = Entry(width=60, font=('Arial', 12, 'normal'), validate="focusout", validatecommand=valid_entry_weight)
         entry.bind('<KeyPress>', key_entry)
-        canvas.create_window(x+150, y, window=entry)
+        canvas.create_window(x+300, y, window=entry)
 
         entry_list.append(entry)
 
