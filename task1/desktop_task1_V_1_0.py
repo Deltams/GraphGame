@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 FONT = ('Arial', 12, 'normal')
 
 root = Tk()
-root.title("Выбор ввода данных")
+root.title("Обход графа в глубину")
 root.geometry("1100x700+150+50")
 
 photo0 = tk.PhotoImage(file="../img/0.png")
@@ -38,10 +38,55 @@ map_me = {
 
 clear_ss_ms_mi = 0 # 1 - ss; 2 - ms; 3 - mi;
 
+# Проверка данных в map_me
+def valid_map_me(map_me, point_dfs):
+    global clear_ss_ms_mi
+    
+    # Если не создан СС или МС или МИ
+    if len(map_me) == 0:
+        if clear_ss_ms_mi == 1:
+            tk.messagebox.showwarning(title='Оййй, не знал)', message='Создайте список смежности!')
+        elif clear_ss_ms_mi == 2:
+            tk.messagebox.showwarning(title='Оййй, не знал)', message='Создайте матрицу смежности!')
+        elif clear_ss_ms_mi == 3:
+            tk.messagebox.showwarning(title='Оййй, не знал)', message='Создайте матрицу инцидентности!')
+        else:
+            tk.messagebox.showwarning(title='Оййй, не знал)', message='Ошибка, где проблема?')
+        return False
+    
+    # Если больше всех данных вершин или меньше
+    if point_dfs > len(map_me) or point_dfs < 1:
+        if point_dfs == 2:
+            tk.messagebox.showwarning(title='Оййй, не знал)', message=f'Обход со {point_dfs} вершины невозможен!')
+        else:
+            tk.messagebox.showwarning(title='Оййй, не знал)', message=f'Обход с {point_dfs} вершины невозможен!')
+        return False
+
+    # Если есть пустые строки
+    for i in map_me:
+        if len(map_me[i]) == 0:
+            tk.messagebox.showwarning(title='Оййй, не знал)', message=f'Вершина {i} должна иметь хотябы одну смежную вершину!')
+            return False
+    
+    #Массив с ходами обхода в глубину
+    array = dfs(map_me, point_dfs)
+    
+    # Если больше одной компоненты связности
+    if len(array)+1 != len(map_me):
+        tk.messagebox.showwarning(title='Оййй, не знал)', message=f'В графе больше чем одна компонента связности!')
+        return False
+    return True
+
+# Запуск первого задания
 def task1_start():
     global map_me
+    
     # Начальная точка обхода графа в глубину
     point_dfs = int(node_number_button_dfs.get())
+
+    # Проверка списка смежности на верные данные
+    if not valid_map_me(map_me, point_dfs):
+        return
 
     #Цвета ребер графа
     edge_col = new_edge_color(map_me)
@@ -205,7 +250,11 @@ def create_matrix_mi():
 def send_answer_mi():
     global map_me
     map_me = {}
-    print(arr)
+
+    if len(arr) == 0:
+        tk.messagebox.showwarning(title='Оййй, не знал)', message='Создайте матрицу инцидентности!')
+        return map_me
+    ## print(arr)
     
     nodes_list = []
     for edge in range(len(arr[0])):
@@ -218,16 +267,18 @@ def send_answer_mi():
                 #print(f"ребро {edge+1} соединяет вершину {node+1}")
         
         if counter == 2:
-            print(f"ребро {edge+1} соединяет вершины {tmp_node}")
+            ## print(f"ребро {edge+1} соединяет вершины {tmp_node}")
             nodes_list.append(tmp_node)
         elif not counter:
-            print(f"ребро {edge+1} не соединяет вершины")
+            pass
+            ## print(f"ребро {edge+1} не соединяет вершины")
         else:
-            print(f"WARNING! Ребро {edge+1} соединяет либо больше 2 вершин, либо 1")
+            pass
+            ## print(f"WARNING! Ребро {edge+1} соединяет либо больше 2 вершин, либо 1")
         
-    print(nodes_list)
+    ## print(nodes_list)
     for pair in nodes_list:
-        print(f"{pair[0]} с вершиной {pair[1]}")
+        ## print(f"{pair[0]} с вершиной {pair[1]}")
         map_me[pair[0]] = []
         map_me[pair[1]] = []
         
@@ -247,7 +298,7 @@ def send_answer_mi():
                 break
         if check:
             map_me[node+1] = []
-    print(map_me)
+    ## print(map_me)
     task1_start()
     return map_me
 
@@ -294,10 +345,10 @@ def input_ss():
     button_var_count_win = top_canvas.create_window(500, 20, window=button_var_count)
 
     label_v_dfs2 = Label(text='Результат обхода в глубину', font=('Arial', 12, 'normal'))
-    label_v_dfs2_win = top_canvas.create_window(500, 55, window=label_v_dfs2)
+    label_v_dfs2_win = top_canvas.create_window(498, 55, window=label_v_dfs2)
 
     save_entries_b = Button(text='Посмотреть обход графа', font=('Arial', 12, 'normal'), command=save_entries_ss)
-    top_canvas.create_window(754, 20, window=save_entries_b)
+    top_canvas.create_window(792, 20, window=save_entries_b)
 
 ##    save_entries_b2 = Button(text='print() с весом', font=('Arial', 12, 'normal'), command=save_entries_with_weight_ss)
 ##    top_canvas.create_window(830, 20, window=save_entries_b2)
@@ -312,28 +363,43 @@ def input_ms():
     global label_v_win, node_number_button
     global node_number_button_win, button_var_count
     global button_var_count_win, button_send
+    global label_v_dfs, label_v_dfs_win
+    global node_number_button_dfs, node_number_button_dfs_win
+    global entry_answer, label_v_dfs2, label_v_dfs2_win
     global clear_ss_ms_mi
 
     clear_ss_ms_mi = 2
     canvas.destroy()
     top_canvas.destroy()
     
-    top_canvas = Canvas(root, width=800, height=50, bg='#fad7d4')
+    top_canvas = Canvas(width=900, height=70, bg='#fad7d4')
     top_canvas.pack()
 
     label_v = Label(text='Количество вершин', font=('Arial', 12, 'normal'))
     label_v_win = top_canvas.create_window(80, 20, window=label_v)
 
+    label_v_dfs = Label(text='Начать обход с вершины', font=('Arial', 12, 'normal'))
+    label_v_dfs_win = top_canvas.create_window(100, 55, window=label_v_dfs)
 
     node_number_button = ttk.Combobox(values=[i for i in range(1, 21)], font=('Arial', 12, 'normal'), width=10)
     node_number_button_win = top_canvas.create_window(280, 20, window=node_number_button)
     node_number_button.current(0)
 
-    button_var_count = Button(text='Создать матрицу смежности', font=('Arial', 10, 'normal'), command=create_matrix_ms)
+    entry_answer = Entry(width=30, font=('Arial', 12, 'normal'), justify='center')
+    top_canvas.create_window(755, 55, window=entry_answer)
+
+    node_number_button_dfs = ttk.Combobox(values=[i for i in range(1, 21)], font=('Arial', 12, 'normal'), width=10)
+    node_number_button_dfs_win = top_canvas.create_window(280, 55, window=node_number_button_dfs)
+    node_number_button_dfs.current(0)
+
+    button_var_count = Button(text='Создать матрицу смежности', font=('Arial', 12, 'normal'), command=create_matrix_ms)
     button_var_count_win = top_canvas.create_window(500, 20, window=button_var_count)
 
-    button_send = Button(text="Сохранить ответы", font=FONT, command=send_answer_ms)
-    top_canvas.create_window(700, 20, window=button_send)
+    label_v_dfs2 = Label(text='Результат обхода в глубину', font=('Arial', 12, 'normal'))
+    label_v_dfs2_win = top_canvas.create_window(492, 55, window=label_v_dfs2)
+
+    save_entries_b = Button(text='Посмотреть обход графа', font=('Arial', 12, 'normal'), command=send_answer_ms)
+    top_canvas.create_window(792, 20, window=save_entries_b)
 
     canvas = Canvas(root, width=800, height=650, bg='#e0defa')
     canvas.pack()
@@ -347,37 +413,51 @@ def input_mi():
     global label_r_win, edge_number_button
     global edge_number_button_win, button_var_count
     global button_var_count_win, button_send
+    global label_v_dfs, label_v_dfs_win
+    global node_number_button_dfs, node_number_button_dfs_win
+    global entry_answer, label_v_dfs2, label_v_dfs2_win
     global clear_ss_ms_mi
 
     clear_ss_ms_mi = 3
     canvas.destroy()
     top_canvas.destroy()
     
-    top_canvas = Canvas(root, width=1100, height=50, bg='#fad7d4')
+    top_canvas = Canvas(root, width=1100, height=70, bg='#fad7d4')
     top_canvas.pack()
     
     label_v = Label(text='Количество вершин', font=('Arial', 12, 'normal'))
-    label_v_win = top_canvas.create_window(100, 20, window=label_v)
+    label_v_win = top_canvas.create_window(90, 20, window=label_v)
 
+    label_v_dfs = Label(text='Начать с вершины', font=('Arial', 12, 'normal'))
+    label_v_dfs_win = top_canvas.create_window(86, 55, window=label_v_dfs)
 
     node_number_button = ttk.Combobox(values=[i for i in range(1, 21)], font=('Arial', 12, 'normal'), width=10)
-    node_number_button_win = top_canvas.create_window(250, 20, window=node_number_button)
+    node_number_button_win = top_canvas.create_window(240, 20, window=node_number_button)
     node_number_button.current(0)
 
+    entry_answer = Entry(width=59, font=('Arial', 12, 'normal'), justify='center')
+    top_canvas.create_window(821, 55, window=entry_answer)
+
+    node_number_button_dfs = ttk.Combobox(values=[i for i in range(1, 21)], font=('Arial', 12, 'normal'), width=10)
+    node_number_button_dfs_win = top_canvas.create_window(240, 55, window=node_number_button_dfs)
+    node_number_button_dfs.current(0)
+
+    label_v_dfs2 = Label(text='Результат обхода в глубину', font=('Arial', 12, 'normal'))
+    label_v_dfs2_win = top_canvas.create_window(423, 55, window=label_v_dfs2)
 
     label_r = Label(text='Количество ребер', font=('Arial', 12, 'normal'))
-    label_r_win = top_canvas.create_window(400, 20, window=label_r)
+    label_r_win = top_canvas.create_window(390, 20, window=label_r)
 
-    edge_number_button = ttk.Combobox(values=[i for i in range(1, 22)], font=('Arial', 12, 'normal'), width=10)
-    edge_number_button_win = top_canvas.create_window(550, 20, window=edge_number_button)
+    edge_number_button = ttk.Combobox(values=[i for i in range(1, 36)], font=('Arial', 12, 'normal'), width=10)
+    edge_number_button_win = top_canvas.create_window(540, 20, window=edge_number_button)
     edge_number_button.current(0)
 
 
-    button_var_count = Button(text='Создать матрицу инцидентности',  font=('Arial', 10, 'normal'), command=create_matrix_mi)
-    button_var_count_win = top_canvas.create_window(750, 20, window=button_var_count)
+    button_var_count = Button(text='Создать матрицу инцидентности',  font=('Arial', 12, 'normal'), command=create_matrix_mi)
+    button_var_count_win = top_canvas.create_window(745, 20, window=button_var_count)
 
-    button_send = Button(text="Сохранить ответы", font=FONT, command=send_answer_mi)
-    top_canvas.create_window(950, 20, window=button_send)
+    button_send = Button(text="Посмотреть обход графа", font=FONT, command=send_answer_mi)
+    top_canvas.create_window(990, 20, window=button_send)
 
     canvas = Canvas(root, width=1100, height=650, bg='#e0defa')
     canvas.pack()
@@ -482,7 +562,7 @@ def send_answer_ms():
         for digit in range(len(arr[number_line])):
             if arr[number_line][digit]:
                 map_me[number_line+1].append(digit+1)
-    print(map_me)
+    ## print(map_me)
     task1_start()
     return map_me
 # Конец ms
@@ -789,7 +869,7 @@ def save_entries_ss():
     for i in range(len(entry_list)):
         map_me[i+1] = validate_string_ss(entry_list[i].get())
     
-    print(map_me)
+    ## print(map_me)
     task1_start()
 
 
@@ -818,7 +898,7 @@ def save_entries_with_weight_ss():
         else:
             map_me[i+1] = validate_string_with_weight_ss(entry_list[i].get())
     
-    print(map_me)
+    ## print(map_me)
 
 
 def validate_string_with_weight_ss(map_string):
@@ -901,7 +981,7 @@ top_canvas.destroy()
 # Конец mi
 
 # Начало ms
-top_canvas = Canvas(root, width=800, height=50, bg='#fad7d4')
+top_canvas = Canvas(root, width=800, height=70, bg='#fad7d4')
 top_canvas.pack()
 
 label_v = Label(text='Количество вершин', font=('Arial', 12, 'normal'))
