@@ -573,6 +573,7 @@ def input_ss():
     global label_v_dfs, label_v_dfs_win
     global node_number_button_dfs, node_number_button_dfs_win
     global entry_answer, label_v_dfs2, label_v_dfs2_win
+    global label_name_ss_ms_mi, label_name_ss_ms_mi_win
     global clear_ss_ms_mi
 
     clear_ss_ms_mi = 1
@@ -581,6 +582,9 @@ def input_ss():
     
     top_canvas = Canvas(width=900, height=70, bg='#fad7d4')
     top_canvas.pack()
+
+    label_name_ss_ms_mi = Label(text='Список смежности', font=('Arial', 14, 'normal'))
+    label_name_ss_ms_mi_win = top_canvas.create_window(394, 20, window=label_name_ss_ms_mi)
 
 ##    label_v = Label(text='Количество вершин', font=('Arial', 12, 'normal'))
 ##    label_v_win = top_canvas.create_window(80, 20, window=label_v)
@@ -625,6 +629,7 @@ def input_ms():
     global label_v_dfs, label_v_dfs_win
     global node_number_button_dfs, node_number_button_dfs_win
     global entry_answer, label_v_dfs2, label_v_dfs2_win
+    global label_name_ss_ms_mi, label_name_ss_ms_mi_win
     global clear_ss_ms_mi
 
     clear_ss_ms_mi = 2
@@ -633,6 +638,9 @@ def input_ms():
     
     top_canvas = Canvas(width=900, height=70, bg='#fad7d4')
     top_canvas.pack()
+
+    label_name_ss_ms_mi = Label(text='Матрица смежности', font=('Arial', 14, 'normal'))
+    label_name_ss_ms_mi_win = top_canvas.create_window(401, 20, window=label_name_ss_ms_mi)
 
 ##    label_v = Label(text='Количество вершин', font=('Arial', 12, 'normal'))
 ##    label_v_win = top_canvas.create_window(80, 20, window=label_v)
@@ -674,6 +682,7 @@ def input_mi():
     global label_v_dfs, label_v_dfs_win
     global node_number_button_dfs, node_number_button_dfs_win
     global entry_answer, label_v_dfs2, label_v_dfs2_win
+    global label_name_ss_ms_mi, label_name_ss_ms_mi_win
     global clear_ss_ms_mi
 
     clear_ss_ms_mi = 3
@@ -682,6 +691,9 @@ def input_mi():
     
     top_canvas = Canvas(root, width=1100, height=70, bg='#fad7d4')
     top_canvas.pack()
+
+    label_name_ss_ms_mi = Label(text='Матрица ицидентности', font=('Arial', 14, 'normal'))
+    label_name_ss_ms_mi_win = top_canvas.create_window(518, 20, window=label_name_ss_ms_mi)
     
 ##    label_v = Label(text='Количество вершин', font=('Arial', 12, 'normal'))
 ##    label_v_win = top_canvas.create_window(90, 20, window=label_v)
@@ -1319,7 +1331,8 @@ label_v_dfs2_win = top_canvas.create_window(500, 55, window=label_v_dfs2)
 save_entries_b = Button(text='print() без веса', font=('Arial', 12, 'normal'), command=save_entries_ss)
 top_canvas.create_window(830, 20, window=save_entries_b)
 
-
+label_name_ss_ms_mi = Label(text='Матрица ицидентности', font=('Arial', 14, 'normal'))
+label_name_ss_ms_mi_win = top_canvas.create_window(518, 20, window=label_name_ss_ms_mi)
 
 ##save_entries_b2 = Button(text='print() с весом', font=('Arial', 12, 'normal'), command=save_entries_with_weight_ss)
 ##top_canvas.create_window(830, 20, window=save_entries_b2)
