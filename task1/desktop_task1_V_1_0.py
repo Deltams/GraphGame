@@ -68,8 +68,12 @@ def valid_map_me(map_me, point_dfs):
             tk.messagebox.showwarning(title='Оййй, не знал)', message=f'Вершина {i} должна иметь хотябы одну смежную вершину!')
             return False
     
-    #Массив с ходами обхода в глубину
-    array = dfs(map_me, point_dfs)
+    try:
+        #Массив с ходами обхода в глубину
+        array = dfs(map_me, point_bfs)
+    except:
+        tk.messagebox.showwarning(title='Оййй, не знал)', message=f'В графе больше чем одна компонента связности!')
+        return False
     
     # Если больше одной компоненты связности
     if len(array)+1 != len(map_me):
