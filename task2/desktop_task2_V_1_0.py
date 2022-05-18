@@ -1,4 +1,4 @@
-from tkinter import *
+Ffrom tkinter import *
 import random
 import tkinter as tk
 from PIL import Image, ImageTk
@@ -692,7 +692,7 @@ def input_mi():
     top_canvas = Canvas(root, width=1100, height=70, bg='#fad7d4')
     top_canvas.pack()
 
-    label_name_ss_ms_mi = Label(text='Матрица ицидентности', font=('Arial', 14, 'normal'))
+    label_name_ss_ms_mi = Label(text='Матрица инцидентности', font=('Arial', 14, 'normal'))
     label_name_ss_ms_mi_win = top_canvas.create_window(518, 20, window=label_name_ss_ms_mi)
     
 ##    label_v = Label(text='Количество вершин', font=('Arial', 12, 'normal'))
