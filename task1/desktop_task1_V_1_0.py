@@ -67,7 +67,7 @@ def valid_map_me(map_me, point_dfs):
         if len(map_me[i]) == 0:
             tk.messagebox.showwarning(title='Оййй, не знал)', message=f'Вершина {i} должна иметь хотябы одну смежную вершину!')
             return False
-    
+        
     try:
         #Массив с ходами обхода в глубину
         array = dfs(map_me, point_dfs)
