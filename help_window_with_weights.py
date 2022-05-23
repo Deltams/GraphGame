@@ -3,12 +3,15 @@
 def open_help_window():
     help_window = Toplevel(root)
     help_window.title('Справка')
-    help_window.geometry('700x350+100+100')
+    help_window.geometry('700x400+100+100')
     help_window.resizable(False, False)
     help_window.grab_set()
 
-    ans = "Ввод данных доступен списком смежности, матрицей смежности и матрицей инцидентности.\n\n"
-    ans += 'Формат ввода можно выбрать в настройках.\n'
+    ans = "\nВвод данных доступен списком смежности, матрицей смежности и матрицей инцидентности.\n"
+    ans += 'Формат ввода можно выбрать в настройках.\n\n'
+
+    ans += "В матрице смежности напишите в ячейке вес ребра.\n"
+    ans += "В матрице инцидентности по горизонтали расположены ребра, по вертикали вершины.\n"
     ans += "Вес ребра в матрицах можно задать, установив число в поле ввода (работает автодополнение)\n"
     ans += "Вес ребра в списке смежности задается в формате Вершина::Вес, (Вершина, Вес), Вершина Вес\n"
     ans += "# 1: 2::3, 4 5, (5, 6), [7, 9]\n"
@@ -21,4 +24,4 @@ def open_help_window():
     ans += "Ярослав Верховых - github.com/vrkh\n"
     ans += "Дмитрий Шевчук - github.com/Deltams\n"
     ans += "Арсений Селицкий - vk.com/id175668822\n"
-    label = Label(help_window, text=ans, font=('Times New Roman', 12, 'normal'), justify='left').pack()
+    label = Label(help_window, text=ans, font=('Times New Roman', 13, 'normal'), justify='left').pack()
